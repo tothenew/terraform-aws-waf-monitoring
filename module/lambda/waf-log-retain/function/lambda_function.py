@@ -19,7 +19,7 @@ def lambda_handler(event, context):
             body = json.loads(record["body"])
             logger.info(json.dumps(body))
 
-            tata_client_ip = ""
+            user_client_ip = ""
             x_forwarded_for = ""
             x_forwarded_for_first = ""
 
@@ -27,19 +27,19 @@ def lambda_handler(event, context):
             logger.info(body["httpRequest"]["uri"])
             logger.info(body["httpRequest"]["clientIp"])
             for obj in body["httpRequest"]["headers"]:
-                if "Tata-Client-Ip" == obj["name"]:
-                    tata_client_ip = obj["value"]
+                if "User-Client-Ip" == obj["name"]:
+                    user_client_ip = obj["value"]
                 elif "X-Forwarded-For" == obj["name"]:
                     x_forwarded_for_first = obj["value"].split(",")[0]
                     x_forwarded_for = obj["value"]
-            logger.info(tata_client_ip)
+            logger.info(user_client_ip)
             logger.info(x_forwarded_for)
 
             es = Elasticsearch([{'host': elastic_host, 'port': "9200"}])
             logger.info(prefix_index_name + str(date) + ' created')
             esdata = {
                 "timestamp": datetime.datetime.now(),
-                "tata_client_ip": tata_client_ip,
+                "user_client_ip": user_client_ip,
                 "x_forwarded_for_first": x_forwarded_for_first,
                 "x_forwarded_for": x_forwarded_for,
                 "request_action": body["action"],
